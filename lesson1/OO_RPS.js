@@ -2,15 +2,45 @@
 
 */
 const readline = require('readline-sync');
-const VALID_CHOICES = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
+const VALID_CHOICES = ['r', 'p', 'sc', 'l', 'sp'];
 const SCORES_TO_WIN = 5;
-const WINNING_MOVES = {
-  rock: ['scissors', 'lizard'],
-  paper: ['rock', 'spock'],
-  scissors: ['paper', 'lizard'],
-  spock: ['scissor', 'rock'],
-  lizard: ['paper', 'spock']
-};
+const MOVES = {
+  r() {
+    return {
+      name: 'rock',
+      shorthand: 'r',
+      beats: ['scissors', 'lizard'],
+    };
+  },
+  p() {
+    return {
+      name: 'paper',
+      shorthand: 'p',
+      beats: ['rock', 'spock'],
+    };
+  },
+  sc() {
+    return {
+      name: 'scissors',
+      shorthand: 'sc',
+      beats: ['paper', 'lizard'],
+    };
+  },
+  l() {
+    return {
+      name: 'lizard',
+      shorthand: 'l',
+      beats: ['paper', 'spock'],
+    };
+  },
+  sp() {
+    return {
+      name: 'spock',
+      shorthand: 'sp',
+      beats: ['rock', 'scissors'],
+    };
+  },
+}
 
 
 function createPlayer() {
@@ -29,13 +59,15 @@ function createHuman() {
       let choice;
 
       while (true) {
-        console.log('Please choose rock, paper, scissors, lizard or spock:');
+        console.log('Enter "r" for rock, "p" for paper, "sc" for scissors,' +
+                    ' "l" for lizard, or "sp" spock:');
         choice = readline.question().toLowerCase();
         if (VALID_CHOICES.includes(choice)) break;
+        console.clear();
         console.log('Sorry, invalid choice.');
       }
 
-      this.move = choice;
+      this.move = MOVES[choice]();
       console.clear();
     },
   };
@@ -50,7 +82,7 @@ function createComputer() {
   let computerObject = {
     choose() {
       let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
-      this.move = VALID_CHOICES[randomIndex];
+      this.move = MOVES[VALID_CHOICES[randomIndex]]();
     },
   };
 
@@ -67,14 +99,14 @@ const RPSGame = {
     let seeRules;
     console.clear();
     console.log('Welcome to Rock, Paper, Scissors, Lizard, Spock!');
-    console.log(`First to win ${SCORES_TO_WIN} rounds wins the game!`)
+    console.log(`First to win ${SCORES_TO_WIN} rounds wins the game!`);
     console.log('If you would like to see the rules, type "rules" ' +
       'or press "enter" to continue:');
     seeRules = readline.question().toLowerCase();
     if (seeRules === 'rules') {
       this.displayRules();
     }
-    console.clear()
+    console.clear();
   },
 
   displayRules() {
@@ -100,9 +132,9 @@ const RPSGame = {
   findRoundWinner() {
     let humanMove = this.human.move;
     let computerMove = this.computer.move;
-    if (WINNING_MOVES[humanMove].includes(computerMove)) {
+    if (humanMove.beats.includes(computerMove.name)) {
       this.roundWinner = 'human';
-    } else if (humanMove === computerMove) {
+    } else if (humanMove.name === computerMove.name) {
       this.roundWinner = 'tie';
     } else {
       this.roundWinner = 'computer';
@@ -113,8 +145,8 @@ const RPSGame = {
     let humanMove = this.human.move;
     let computerMove = this.computer.move;
 
-    console.log(`You chose: ${humanMove}`);
-    console.log(`The computer chose: ${computerMove}`);
+    console.log(`You chose: ${humanMove.name}`);
+    console.log(`The computer chose: ${computerMove.name}`);
 
     if (this.roundWinner === 'human') {
       console.log('You win!');
@@ -137,7 +169,7 @@ const RPSGame = {
 
   hasSomeoneWon() {
     return (this.human.score === SCORES_TO_WIN
-          || this.computer.score === SCORES_TO_WIN)
+        || this.computer.score === SCORES_TO_WIN);
   },
 
   displayGrandWinner() {
@@ -178,13 +210,13 @@ const RPSGame = {
     do {
       this.setScoresToZero();
       while (true) {
-      this.displayScore();
-      this.human.choose();
-      this.computer.choose();
-      this.findRoundWinner();
-      this.displayRoundWinner();
-      this.addToWinnerScore();
-      if (this.hasSomeoneWon()) break;
+        this.displayScore();
+        this.human.choose();
+        this.computer.choose();
+        this.findRoundWinner();
+        this.displayRoundWinner();
+        this.addToWinnerScore();
+        if (this.hasSomeoneWon()) break;
       }
       this.displayGrandWinner();
     } while (this.playAgain());
