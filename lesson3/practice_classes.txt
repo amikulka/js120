@@ -1,0 +1,9 @@
+1)
+it means it can be passed to a function as an argument or be returned by a 
+function. It can also be assigned to a variable like any other value.
+
+2)
+it makes it so the method is defined directly on the class and not on the objects
+the class creates
+you would invoke it like
+Television.manufacturer();
